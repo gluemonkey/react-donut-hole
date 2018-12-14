@@ -15,17 +15,26 @@ npm install --save react-doughnut-hole
 ```jsx
 import React, { Component } from 'react'
 
-import MyComponent from 'react-doughnut-hole'
+import DoughnutChart from 'react-doughnut-hole'
+
+const segments = [
+  {key: 'Pepperoni', value: 80, color: 'red'},
+  {key: 'Sausage', value: 80, color: 'green'},
+  {key: 'Mushroom', value: 80, color: 'blue'}
+]
 
 class Example extends Component {
   render () {
     return (
-      <MyComponent />
+      <div>
+        <DoughnutChart segments={segments} />
+      </div>
     )
   }
 }
+
 ```
 
 ## License
 
-MIT © [gluemonkey](https://github.com/gluemonkey)
+MIT © [Patrick Poole](https://github.com/gluemonkey)
