@@ -76,19 +76,25 @@ var possibleConstructorReturn = function (self, call) {
 
 var CircleElement = function CircleElement(_ref) {
   var children = _ref.children,
-      props = objectWithoutProperties(_ref, ['children']);
+      dasharray = _ref.dasharray,
+      dashoffset = _ref.dashoffset,
+      props = objectWithoutProperties(_ref, ['children', 'dasharray', 'dashoffset']);
 
   var activeStyles = {
     transitionProperty: 'all, opacity',
-    transitionDuration: '0.5s, 0s',
+    transitionDuration: '0.3s, 0s',
     transitionDelay: '0s, 0s',
-    transitionTimingFunction: 'ease-in-out, ease-in-out'
+    transitionTimingFunction: 'linear, linear',
+    strokeDasharray: dasharray,
+    strokeDashoffset: dashoffset
   };
   var inactiveStyles = {
     transitionProperty: 'all, opacity',
-    transitionDuration: '0.5s, 0s',
-    transitionDelay: '0s, 0.5s',
-    transitionTimingFunction: 'ease-in-out, ease-in-out'
+    transitionDuration: '0.3s, 0s',
+    transitionDelay: '0s, 0.3s',
+    transitionTimingFunction: 'linear, linear',
+    strokeDasharray: dasharray,
+    strokeDashoffset: dashoffset
   };
   var calcStyles = props.opacity === 1 ? activeStyles : inactiveStyles;
   return React.createElement('circle', _extends({}, props, {
@@ -119,7 +125,6 @@ var DoughnutChartSegment = function (_Component) {
           offset = _props.offset,
           color = _props.color,
           lineWidth = _props.lineWidth,
-          shown = _props.shown,
           delay = _props.delay,
           showSeperator = _props.showSeperator,
           segmentShown = _props.segmentShown;
@@ -137,15 +142,17 @@ var DoughnutChartSegment = function (_Component) {
       };
 
       var segmentContainerStyle = {
-        transformOrigin: 'center 45.8%',
+        transformOrigin: 'center 50%',
         transitionProperty: 'all',
-        transitionDuration: '0.5s',
+        transitionDuration: '0.3s',
         transitionDelay: '0s',
-        transitionTimingFunction: 'ease-in-out',
+        transitionTimingFunction: 'linear',
         // opacity: (shown ? 1 : 0),
         opacity: 1,
-        transform: 'scale(0.8) rotate(' + mainSegmentConfig.rotation + 'deg)'
+        transform: 'rotate(' + mainSegmentConfig.rotation + 'deg)'
       };
+
+      console.log(mainSegmentConfig.rotation);
 
       return React.createElement(
         'g',
@@ -158,8 +165,8 @@ var DoughnutChartSegment = function (_Component) {
           stroke: mainSegmentConfig.color,
           strokeWidth: lineWidth
           // opacity={segmentShown ? 1 : 0}
-          , strokeDasharray: mainSegmentConfig.dasharray,
-          strokeDashoffset: mainSegmentConfig.dashoffset }),
+          , dasharray: mainSegmentConfig.dasharray,
+          dashoffset: mainSegmentConfig.dashoffset }),
         React.createElement(CircleElement, {
           cx: '21',
           cy: '21'
@@ -168,8 +175,8 @@ var DoughnutChartSegment = function (_Component) {
           fill: 'transparent',
           stroke: 'url(#grad1)',
           strokeWidth: lineWidth,
-          strokeDasharray: mainSegmentConfig.dasharray,
-          strokeDashoffset: mainSegmentConfig.dashoffset })
+          dasharray: mainSegmentConfig.dasharray,
+          dashoffset: mainSegmentConfig.dashoffset })
       );
     }
   }]);
@@ -193,7 +200,7 @@ var ContainerStyle = {
   margin: '18px'
 };
 
-var LabelStyle = {
+var LabelContainerStyle = {
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
@@ -203,12 +210,22 @@ var LabelStyle = {
   top: '0',
   left: '0',
   width: '100%',
-  height: '92%'
+  height: '100%'
 };
 
 var CircleBoxStyle = {
   position: 'relative',
-  padding: '14px 30px 0 30px'
+  padding: '14px 30px 75% 30px'
+};
+
+var SVGStyle = {
+  position: 'absolute',
+  top: 0,
+  left: 0
+};
+
+var segmentShown = function segmentShown(segment, props) {
+  return segment.value === 0 || props.filters.includes(segment.key);
 };
 
 var getSegmentConfigs = function getSegmentConfigs(props) {
@@ -225,13 +242,11 @@ var getSegmentConfigs = function getSegmentConfigs(props) {
     return seg.value;
   }));
 
-  segments.forEach(function (_ref) {
-    var key = _ref.key,
-        value = _ref.value,
-        color = _ref.color;
+  segments.forEach(function (segment) {
+    var value = segment.value;
 
     var percent = value / total * 100;
-    if (percent === 0) {
+    if (segmentShown(segment, props)) {
       remainderPercentage += percent;
       unshown += 1;
     }
@@ -239,14 +254,13 @@ var getSegmentConfigs = function getSegmentConfigs(props) {
 
   var eachSectionGets = remainderPercentage / (segments.length - unshown);
 
-  segments.forEach(function (_ref2) {
-    var key = _ref2.key,
-        value = _ref2.value,
-        color = _ref2.color;
+  segments.forEach(function (segment) {
+    var value = segment.value,
+        color = segment.color;
 
     var percent = value / total * 100;
     var segPercent = eachSectionGets + percent;
-    if (value === 0) {
+    if (segmentShown(segment, props)) {
       segPercent = 0;
     }
     segmentObjects.push({
@@ -286,8 +300,9 @@ var DoughnutChart = function (_Component) {
     value: function render() {
       var _props = this.props,
           className = _props.className,
-          shown = _props.shown,
-          lineWidth = _props.lineWidth;
+          show = _props.show,
+          lineWidth = _props.lineWidth,
+          dropShadow = _props.dropShadow;
 
 
       var segmentObjects = getSegmentConfigs(this.props);
@@ -301,9 +316,36 @@ var DoughnutChart = function (_Component) {
           React.createElement(
             'div',
             { style: CircleBoxStyle },
+            dropShadow && React.createElement(
+              'svg',
+              { width: '100%', height: '100%', viewBox: '0 0 42 46', style: SVGStyle },
+              React.createElement(
+                'defs',
+                null,
+                React.createElement(
+                  'radialGradient',
+                  { id: 'drop', cx: '50%', cy: '50%', r: '100%', fx: '50%', fy: '50%' },
+                  React.createElement('stop', { offset: '0%', stopColor: '#000', stopOpacity: '0.4' }),
+                  React.createElement('stop', { offset: '40%', stopColor: '#000', stopOpacity: '0' })
+                )
+              ),
+              React.createElement('circle', {
+                cx: '16.4',
+                cy: '206',
+                className: 'shadow',
+                r: '15.91549430918954',
+                fill: 'url(#drop)',
+                stroke: 'transparent',
+                strokeWidth: '0',
+                transform: 'scale(1.3,0.2)',
+                style: {
+                  transition: 'opacity 0.5s ease-in-out',
+                  opacity: show ? 1 : 0
+                } })
+            ),
             React.createElement(
               'svg',
-              { width: '100%', height: '100%', viewBox: '0 0 42 46', className: 'donut' },
+              { width: '100%', height: '100%', viewBox: '0 0 42 42', style: SVGStyle },
               React.createElement(
                 'defs',
                 null,
@@ -313,31 +355,10 @@ var DoughnutChart = function (_Component) {
                   React.createElement('stop', { offset: '20%', stopColor: '#000', stopOpacity: '0.5' }),
                   React.createElement('stop', { offset: '50%', stopColor: '#000', stopOpacity: '0' }),
                   React.createElement('stop', { offset: '80%', stopColor: '#000', stopOpacity: '0.5' })
-                ),
-                React.createElement(
-                  'radialGradient',
-                  { id: 'drop', cx: '50%', cy: '50%', r: '100%', fx: '50%', fy: '50%' },
-                  React.createElement('stop', { offset: '0%', stopColor: '#000', stopOpacity: '0.4' }),
-                  React.createElement('stop', { offset: '40%', stopColor: '#000', stopOpacity: '0' })
                 )
               ),
-              React.createElement('circle', {
-                cx: '19.4',
-                cy: '206',
-                className: 'shadow',
-                r: '15.91549430918954',
-                fill: 'url(#drop)',
-                stroke: 'transparent',
-                strokeWidth: '0',
-                transform: 'scale(1.1,0.2)',
-                style: {
-                  transition: 'opacity 0.5s ease-in-out',
-                  opacity: 1
-                  // opacity: shown ? 1 : 0
-                } }),
               segmentObjects.map(function (segmentObject) {
                 return React.createElement(DoughnutChartSegment, {
-                  shown: shown,
                   segmentShown: segmentObject.shown,
                   percent: segmentObject.percent,
                   offset: segmentObject.offset,
@@ -349,7 +370,7 @@ var DoughnutChart = function (_Component) {
             ),
             React.createElement(
               'div',
-              { style: LabelStyle },
+              { style: LabelContainerStyle },
               React.createElement(
                 'p',
                 null,
@@ -379,6 +400,7 @@ DoughnutChart.defaultProps = {
   textColor: '#6b778c',
   size: '400',
   lineWidth: '9',
+  dropShadow: true,
   percentSpacing: 10
 };
 

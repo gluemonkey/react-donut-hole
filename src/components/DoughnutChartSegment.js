@@ -1,17 +1,21 @@
 import React, { Component } from 'react'
 
-const CircleElement = ({children, ...props}) => {
+const CircleElement = ({children, dasharray, dashoffset, ...props}) => {
   const activeStyles = {
     transitionProperty: 'all, opacity',
-    transitionDuration: '0.5s, 0s',
+    transitionDuration: '0.3s, 0s',
     transitionDelay: '0s, 0s',
-    transitionTimingFunction: 'ease-in-out, ease-in-out',
+    transitionTimingFunction: 'linear, linear',
+    strokeDasharray: dasharray,
+    strokeDashoffset: dashoffset
   }
   const inactiveStyles = {
     transitionProperty: 'all, opacity',
-    transitionDuration: '0.5s, 0s',
-    transitionDelay: '0s, 0.5s',
-    transitionTimingFunction: 'ease-in-out, ease-in-out',
+    transitionDuration: '0.3s, 0s',
+    transitionDelay: '0s, 0.3s',
+    transitionTimingFunction: 'linear, linear',
+    strokeDasharray: dasharray,
+    strokeDashoffset: dashoffset
   }
   const calcStyles = props.opacity === 1 ? activeStyles : inactiveStyles
   return (
@@ -23,22 +27,22 @@ const CircleElement = ({children, ...props}) => {
 
 class DoughnutChartSegment extends Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       isVisible: false,
       shown: false,
-      percentage: 0,
+      percentage: 0
     }
   }
 
   render() {
-    const { percent, offset, color, lineWidth, shown, delay, showSeperator, segmentShown} = this.props;
-    const segmentOffset = 25;
-    const seperatorPercentage = showSeperator ? 0.7 : 0;
-    const mainSegPercentage = Math.max(0, (percent - seperatorPercentage));
+    const { percent, offset, color, lineWidth, delay, showSeperator, segmentShown} = this.props;
+    const segmentOffset = 25
+    const seperatorPercentage = showSeperator ? 0.7 : 0
+    const mainSegPercentage = Math.max(0, (percent - seperatorPercentage))
 
     const mainSegmentConfig = {
-      dasharray: `${mainSegPercentage} ${100-mainSegPercentage}`,
+      dasharray: `${mainSegPercentage} ${100 - mainSegPercentage}`,
       rotation: ((offset + segmentOffset) / 100) * 360,
       dashoffset: `0`,
       color: color
@@ -46,15 +50,17 @@ class DoughnutChartSegment extends Component {
     }
 
     const segmentContainerStyle = {
-      transformOrigin: 'center 45.8%',
+      transformOrigin: 'center 50%',
       transitionProperty: 'all',
-      transitionDuration: '0.5s',
+      transitionDuration: '0.3s',
       transitionDelay: '0s',
-      transitionTimingFunction: 'ease-in-out',
+      transitionTimingFunction: 'linear',
       // opacity: (shown ? 1 : 0),
       opacity: 1,
-      transform: `scale(0.8) rotate(${mainSegmentConfig.rotation}deg)`
+      transform: `rotate(${mainSegmentConfig.rotation}deg)`
     }
+
+    console.log(mainSegmentConfig.rotation);
 
     return (
       <g style={segmentContainerStyle}>
@@ -66,8 +72,8 @@ class DoughnutChartSegment extends Component {
           stroke={mainSegmentConfig.color}
           strokeWidth={lineWidth}
           // opacity={segmentShown ? 1 : 0}
-          strokeDasharray={mainSegmentConfig.dasharray}
-          strokeDashoffset={mainSegmentConfig.dashoffset} />
+          dasharray={mainSegmentConfig.dasharray}
+          dashoffset={mainSegmentConfig.dashoffset} />
         <CircleElement
           cx='21'
           cy='21'
@@ -76,8 +82,8 @@ class DoughnutChartSegment extends Component {
           fill='transparent'
           stroke='url(#grad1)'
           strokeWidth={lineWidth}
-          strokeDasharray={mainSegmentConfig.dasharray}
-          strokeDashoffset={mainSegmentConfig.dashoffset} />
+          dasharray={mainSegmentConfig.dasharray}
+          dashoffset={mainSegmentConfig.dashoffset} />
       </g>
     )
   }

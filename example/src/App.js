@@ -2,17 +2,61 @@ import React, { Component } from 'react'
 
 import DoughnutChart from 'react-doughnut-hole'
 
-const segments = [
-  {key: 'Pepperoni', value: 80, color: 'red'},
-  {key: 'Sausage', value: 80, color: 'green'},
-  {key: 'Mushroom', value: 80, color: 'blue'}
+const fillingSegments = [
+  {key: 'Plain', value: 80, color: 'red'},
+  {key: 'Raspberry Filled', value: 80, color: 'green'},
+  {key: 'Blueberry Filled', value: 80, color: 'blue'}
+]
+
+const toppingSegments = [
+  {key: 'Plain', value: 90, color: 'red'},
+  {key: 'Pink Frosting', value: 80, color: 'green'},
+  {key: 'Maple Frosting', value: 20, color: 'blue'}
 ]
 
 export default class App extends Component {
+  state = {
+    filters: [],
+    segments: fillingSegments
+  }
+  
+  setFilter = (key) => {
+    const filters = this.state.filters.includes(key) ? 
+      this.state.filters.filter((val) => val !== key) 
+      : this.state.filters.concat(key)
+    this.setState({filters})
+  }
+
+  toggleChartType = () => {
+    const { segments } = this.state;
+    segments === fillingSegments ? 
+      this.setState({segments: toppingSegments, filters: []}) 
+      : this.setState({segments: fillingSegments, filters: []})
+  }
+
   render () {
+    const { filters, segments } = this.state;
     return (
       <div>
-        <DoughnutChart segments={segments} />
+        {segments === fillingSegments ? (
+          <div>
+            <button onClick={() => this.setFilter('Plain')}>Toggle Plain</button>
+            <button onClick={() => this.setFilter('Raspberry Filled')}>Toggle Raspberry Filled</button>
+            <button onClick={() => this.setFilter('Blueberry Filled')}>Toggle Blueberry Filled</button>
+          </div>
+        ):(
+          <div>
+            <button onClick={() => this.setFilter('Plain')}>Toggle Plain</button>
+            <button onClick={() => this.setFilter('Pink Frosting')}>Toggle Pink Frosting</button>
+            <button onClick={() => this.setFilter('Maple Frosting')}>Toggle Maple Frosting</button>
+          </div>
+        )}
+        <div>
+          <button onClick={() => this.toggleChartType()}>Toggle Chart Type</button>
+        </div>
+        <div>
+          <DoughnutChart segments={segments} filters={filters} />
+        </div>
       </div>
     )
   }

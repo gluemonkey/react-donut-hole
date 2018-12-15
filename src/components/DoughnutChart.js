@@ -12,7 +12,7 @@ const ContainerStyle = {
   margin: '18px'
 }
 
-const LabelStyle = {
+const LabelContainerStyle = {
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
@@ -22,13 +22,21 @@ const LabelStyle = {
   top: '0',
   left: '0',
   width: '100%',
-  height: '92%'
+  height: '100%'
 }
 
 const CircleBoxStyle = {
   position: 'relative',
-  padding: '14px 30px 0 30px'
+  padding: '14px 30px 75% 30px'
 }
+
+const SVGStyle = {
+  position: 'absolute',
+  top: 0,
+  left: 0
+}
+
+const segmentShown = (segment, props) => segment.value === 0 || props.filters.includes(segment.key)
 
 const getSegmentConfigs = (props) => {
   const { segments } = props
@@ -41,9 +49,10 @@ const getSegmentConfigs = (props) => {
 
   const total = sum(segments.map((seg) => seg.value))
 
-  segments.forEach(({key, value, color}) => {
+  segments.forEach((segment) => {
+    const { value } = segment
     const percent = (value / total) * 100
-    if (percent === 0) {
+    if (segmentShown(segment, props)) {
       remainderPercentage += percent
       unshown += 1
     }
@@ -51,10 +60,11 @@ const getSegmentConfigs = (props) => {
 
   const eachSectionGets = remainderPercentage / (segments.length - unshown)
 
-  segments.forEach(({key, value, color}) => {
+  segments.forEach((segment) => {
+    const { value, color } = segment
     const percent = (value / total) * 100
     let segPercent = eachSectionGets + percent
-    if (value === 0) {
+    if (segmentShown(segment, props)) {
       segPercent = 0
     };
 
@@ -86,6 +96,7 @@ class DoughnutChart extends Component {
     textColor: '#6b778c',
     size: '400',
     lineWidth: '9',
+    dropShadow: true,
     percentSpacing: 10
   }
 
@@ -99,7 +110,7 @@ class DoughnutChart extends Component {
   }
 
   render() {
-    const { className, shown, lineWidth } = this.props
+    const { className, show, lineWidth, dropShadow } = this.props
 
     let segmentObjects = getSegmentConfigs(this.props)
 
@@ -107,35 +118,39 @@ class DoughnutChart extends Component {
       <div className={className}>
         <div style={ContainerStyle}>
           <div style={CircleBoxStyle}>
-            <svg width='100%' height='100%' viewBox='0 0 42 46' className='donut'>
+            {dropShadow &&
+              <svg width='100%' height='100%' viewBox='0 0 42 46' style={SVGStyle}>
+                <defs>
+                  <radialGradient id='drop' cx='50%' cy='50%' r='100%' fx='50%' fy='50%'>
+                    <stop offset='0%' stopColor='#000' stopOpacity='0.4' />
+                    <stop offset='40%' stopColor='#000' stopOpacity='0' />
+                  </radialGradient>
+                </defs>
+                <circle
+                  cx='16.4'
+                  cy='206'
+                  className={'shadow'}
+                  r='15.91549430918954'
+                  fill='url(#drop)'
+                  stroke='transparent'
+                  strokeWidth='0'
+                  transform='scale(1.3,0.2)'
+                  style={{
+                    transition: 'opacity 0.5s ease-in-out',
+                    opacity: show ? 1 : 0
+                  }} />
+              </svg>
+            }
+            <svg width='100%' height='100%' viewBox='0 0 42 42' style={SVGStyle}>
               <defs>
                 <radialGradient id='grad1' cx='50%' cy='50%' r='100%' fx='50%' fy='50%'>
                   <stop offset='20%' stopColor='#000' stopOpacity='0.5' />
                   <stop offset='50%' stopColor='#000' stopOpacity='0' />
                   <stop offset='80%' stopColor='#000' stopOpacity='0.5' />
                 </radialGradient>
-                <radialGradient id='drop' cx='50%' cy='50%' r='100%' fx='50%' fy='50%'>
-                  <stop offset='0%' stopColor='#000' stopOpacity='0.4' />
-                  <stop offset='40%' stopColor='#000' stopOpacity='0' />
-                </radialGradient>
               </defs>
-              <circle
-                cx='19.4'
-                cy='206'
-                className={'shadow'}
-                r='15.91549430918954'
-                fill='url(#drop)'
-                stroke='transparent'
-                strokeWidth='0'
-                transform='scale(1.1,0.2)'
-                style={{
-                  transition: 'opacity 0.5s ease-in-out',
-                  opacity: 1
-                  // opacity: shown ? 1 : 0
-                }} />
               {segmentObjects.map((segmentObject) =>
                 <DoughnutChartSegment
-                  shown={shown}
                   segmentShown={segmentObject.shown}
                   percent={segmentObject.percent}
                   offset={segmentObject.offset}
@@ -145,7 +160,7 @@ class DoughnutChart extends Component {
                   lineWidth={lineWidth} />
               )}
             </svg>
-            <div style={LabelStyle}>
+            <div style={LabelContainerStyle}>
               <p>Label Here</p>
             </div>
           </div>
