@@ -1,10 +1,14 @@
 import React, { Component } from 'react'
 
+import PropTypes from 'prop-types'
+
+import DoughnutChartSegmentElement from './DoughnutChartSegmentElement'
+
 const calcSegmentConfig = (percent, offset, props) => {
-  const { color, showSeperator} = props
+  const { color, showSeperator } = props
   const segmentOffset = 25
   const seperatorPercentage = showSeperator ? 0.7 : 0
-  const mainSegPercentage =  Math.max(0, (percent - seperatorPercentage))
+  const mainSegPercentage = Math.max(0, (percent - seperatorPercentage))
 
   return {
     dasharray: `${mainSegPercentage} ${100 - mainSegPercentage}`,
@@ -14,33 +18,17 @@ const calcSegmentConfig = (percent, offset, props) => {
   }
 }
 
-const CircleElement = ({children, initalSegmentConfig, animatedSegmentConfig, ...props}) => {
-  const activeStyles = {
-    transitionProperty: 'all, opacity',
-    transitionDuration: '0.3s, 0s',
-    transitionDelay: '0s, 0s',
-    transitionTimingFunction: 'linear, linear',
-    strokeDasharray: animatedSegmentConfig.dasharray,
-    strokeDashoffset: animatedSegmentConfig.dashoffset
-  }
-
-  const inactiveStyles = {
-    transitionProperty: 'all, opacity',
-    transitionDuration: '0.3s, 0s',
-    transitionDelay: '0s, 0s',
-    transitionTimingFunction: 'linear, linear',
-    strokeDasharray: initalSegmentConfig.dasharray,
-    strokeDashoffset: initalSegmentConfig.dashoffset
-  }
-  const calcStyles = props.animatedIn ? activeStyles : inactiveStyles
-  return (
-    <circle
-      {...props}
-      style={calcStyles} />
-  )
-}
-
 class DoughnutChartSegment extends Component {
+  static propTypes = {
+    percent: PropTypes.number.isRequired,
+    fromPercent: PropTypes.number.isRequired,
+    offset: PropTypes.number.isRequired,
+    fromOffset: PropTypes.number.isRequired,
+    lineWidth: PropTypes.number,
+    animationDuration: PropTypes.string,
+    segmentStyle: PropTypes.oneOf(['flat', 'raised'])
+  }
+
   constructor(props) {
     super(props)
     this.state = {
@@ -49,7 +37,9 @@ class DoughnutChartSegment extends Component {
   }
 
   componentDidMount() {
-    if (this.props.percent !== this.props.fromPercent) {
+    const { percent, fromPercent } = this.props
+
+    if (percent !== fromPercent) {
       setTimeout(() => {
         this.setState({ animate: true })
       }, 0)
@@ -65,7 +55,15 @@ class DoughnutChartSegment extends Component {
   }
 
   render() {
-    const { percent, fromPercent, isInital, fromOffset, offset, color, lineWidth, showSeperator, segmentStyle} = this.props
+    const {
+      percent,
+      fromPercent,
+      fromOffset,
+      offset,
+      lineWidth,
+      animationDuration,
+      segmentStyle
+    } = this.props
     const { animate } = this.state
 
     const initialSegmentConfig = calcSegmentConfig(fromPercent, fromOffset, this.props)
@@ -74,7 +72,7 @@ class DoughnutChartSegment extends Component {
     const segmentContainerStyle = {
       transformOrigin: 'center 50%',
       transitionProperty: 'all',
-      transitionDuration: '0.3s',
+      transitionDuration: animationDuration,
       transitionDelay: '0s',
       transitionTimingFunction: 'linear',
       opacity: 1,
@@ -83,7 +81,7 @@ class DoughnutChartSegment extends Component {
 
     return (
       <g style={segmentContainerStyle}>
-        <CircleElement
+        <DoughnutChartSegmentElement
           cx='21'
           cy='21'
           r='15.91549430918953357688837633725143'
@@ -92,9 +90,10 @@ class DoughnutChartSegment extends Component {
           animatedIn={animate}
           strokeWidth={lineWidth}
           initalSegmentConfig={initialSegmentConfig}
+          animationDuration={animationDuration}
           animatedSegmentConfig={toSegmentConfig} />
         {segmentStyle === 'raised' &&
-          <CircleElement
+          <DoughnutChartSegmentElement
             cx='21'
             cy='21'
             r='15.91549430918953357688837633725143'
@@ -103,6 +102,7 @@ class DoughnutChartSegment extends Component {
             animatedIn={animate}
             strokeWidth={lineWidth}
             initalSegmentConfig={initialSegmentConfig}
+            animationDuration={animationDuration}
             animatedSegmentConfig={toSegmentConfig} />
         }
       </g>

@@ -41,6 +41,48 @@ export default class App extends Component {
 
 ```
 
+## Props
+
+#### segments: `Array<SegmentConfig>`
+
+> required
+
+A segment config object requires the following object keys
+`key: string` - a unique key to identify the value which is also used for filtering
+`value: number` - any number value
+`color: string` - css style hex or color value
+
+#### filters: `Array<string>`
+
+> default: `[]`
+
+Array of strings coresponding to the segment key values to be filtered out
+
+#### animationDuration: `string`
+
+> default: `"0.2s"`
+
+Time spent animating between segment values when provided to the component.
+
+
+#### lineWidth: `number`
+
+> default: `9`
+
+Specifies the relative thickness of the doughnut
+
+#### dropShadow: `boolean`
+
+> default: `false`
+
+Adds a drop shadow below the chart
+
+#### segmentStyle: `string 'flat'|'raised'`
+
+> default: `flat`
+
+Selects either a flat or raised style for the chart
+
 ## License
 
 MIT © [Patrick Poole](https://github.com/gluemonkey)

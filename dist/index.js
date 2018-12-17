@@ -4,6 +4,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 
 var React = require('react');
 var React__default = _interopDefault(React);
+var PropTypes = _interopDefault(require('prop-types'));
 
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -79,6 +80,53 @@ var possibleConstructorReturn = function (self, call) {
   return call && (typeof call === "object" || typeof call === "function") ? call : self;
 };
 
+var CircleElement = function CircleElement(props) {
+  var initalSegmentConfig = props.initalSegmentConfig,
+      animatedSegmentConfig = props.animatedSegmentConfig,
+      animatedIn = props.animatedIn,
+      animationDuration = props.animationDuration,
+      circleProps = objectWithoutProperties(props, ['initalSegmentConfig', 'animatedSegmentConfig', 'animatedIn', 'animationDuration']);
+
+
+  var baseStyles = {
+    transitionProperty: 'all, opacity',
+    transitionDuration: animationDuration + ', 0s',
+    transitionDelay: '0s, 0s',
+    transitionTimingFunction: 'linear, linear'
+  };
+
+  var activeStyles = _extends({}, baseStyles, {
+    strokeDasharray: animatedSegmentConfig.dasharray,
+    strokeDashoffset: animatedSegmentConfig.dashoffset
+  });
+
+  var inactiveStyles = _extends({}, baseStyles, {
+    strokeDasharray: initalSegmentConfig.dasharray,
+    strokeDashoffset: initalSegmentConfig.dashoffset
+  });
+
+  var calcStyles = animatedIn ? activeStyles : inactiveStyles;
+
+  return React__default.createElement('circle', _extends({}, circleProps, { style: calcStyles }));
+};
+
+CircleElement.propTypes = {
+  initalSegmentConfig: PropTypes.shape({
+    dasharray: PropTypes.string,
+    rotation: PropTypes.number,
+    dashoffset: PropTypes.string,
+    color: PropTypes.string
+  }).isRequired,
+  animatedSegmentConfig: PropTypes.shape({
+    dasharray: PropTypes.string,
+    rotation: PropTypes.number,
+    dashoffset: PropTypes.string,
+    color: PropTypes.string
+  }).isRequired,
+  animationDuration: PropTypes.string,
+  animatedIn: PropTypes.bool.isRequired
+};
+
 var calcSegmentConfig = function calcSegmentConfig(percent, offset, props) {
   var color = props.color,
       showSeperator = props.showSeperator;
@@ -93,34 +141,6 @@ var calcSegmentConfig = function calcSegmentConfig(percent, offset, props) {
     dashoffset: '0',
     color: color
   };
-};
-
-var CircleElement = function CircleElement(_ref) {
-  var children = _ref.children,
-      initalSegmentConfig = _ref.initalSegmentConfig,
-      animatedSegmentConfig = _ref.animatedSegmentConfig,
-      props = objectWithoutProperties(_ref, ['children', 'initalSegmentConfig', 'animatedSegmentConfig']);
-
-  var activeStyles = {
-    transitionProperty: 'all, opacity',
-    transitionDuration: '0.3s, 0s',
-    transitionDelay: '0s, 0s',
-    transitionTimingFunction: 'linear, linear',
-    strokeDasharray: animatedSegmentConfig.dasharray,
-    strokeDashoffset: animatedSegmentConfig.dashoffset
-  };
-
-  var inactiveStyles = {
-    transitionProperty: 'all, opacity',
-    transitionDuration: '0.3s, 0s',
-    transitionDelay: '0s, 0s',
-    transitionTimingFunction: 'linear, linear',
-    strokeDasharray: initalSegmentConfig.dasharray,
-    strokeDashoffset: initalSegmentConfig.dashoffset
-  };
-  var calcStyles = props.animatedIn ? activeStyles : inactiveStyles;
-  return React__default.createElement('circle', _extends({}, props, {
-    style: calcStyles }));
 };
 
 var DoughnutChartSegment = function (_Component) {
@@ -142,7 +162,12 @@ var DoughnutChartSegment = function (_Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      if (this.props.percent !== this.props.fromPercent) {
+      var _props = this.props,
+          percent = _props.percent,
+          fromPercent = _props.fromPercent;
+
+
+      if (percent !== fromPercent) {
         setTimeout(function () {
           _this2.setState({ animate: true });
         }, 0);
@@ -162,16 +187,14 @@ var DoughnutChartSegment = function (_Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _props = this.props,
-          percent = _props.percent,
-          fromPercent = _props.fromPercent,
-          isInital = _props.isInital,
-          fromOffset = _props.fromOffset,
-          offset = _props.offset,
-          color = _props.color,
-          lineWidth = _props.lineWidth,
-          showSeperator = _props.showSeperator,
-          segmentStyle = _props.segmentStyle;
+      var _props2 = this.props,
+          percent = _props2.percent,
+          fromPercent = _props2.fromPercent,
+          fromOffset = _props2.fromOffset,
+          offset = _props2.offset,
+          lineWidth = _props2.lineWidth,
+          animationDuration = _props2.animationDuration,
+          segmentStyle = _props2.segmentStyle;
       var animate = this.state.animate;
 
 
@@ -181,7 +204,7 @@ var DoughnutChartSegment = function (_Component) {
       var segmentContainerStyle = {
         transformOrigin: 'center 50%',
         transitionProperty: 'all',
-        transitionDuration: '0.3s',
+        transitionDuration: animationDuration,
         transitionDelay: '0s',
         transitionTimingFunction: 'linear',
         opacity: 1,
@@ -200,6 +223,7 @@ var DoughnutChartSegment = function (_Component) {
           animatedIn: animate,
           strokeWidth: lineWidth,
           initalSegmentConfig: initialSegmentConfig,
+          animationDuration: animationDuration,
           animatedSegmentConfig: toSegmentConfig }),
         segmentStyle === 'raised' && React__default.createElement(CircleElement, {
           cx: '21',
@@ -210,12 +234,23 @@ var DoughnutChartSegment = function (_Component) {
           animatedIn: animate,
           strokeWidth: lineWidth,
           initalSegmentConfig: initialSegmentConfig,
+          animationDuration: animationDuration,
           animatedSegmentConfig: toSegmentConfig })
       );
     }
   }]);
   return DoughnutChartSegment;
 }(React.Component);
+
+DoughnutChartSegment.propTypes = {
+  percent: PropTypes.number.isRequired,
+  fromPercent: PropTypes.number.isRequired,
+  offset: PropTypes.number.isRequired,
+  fromOffset: PropTypes.number.isRequired,
+  lineWidth: PropTypes.number,
+  animationDuration: PropTypes.string,
+  segmentStyle: PropTypes.oneOf(['flat', 'raised'])
+};
 
 var add = function add(a, b) {
   return a + b;
@@ -305,8 +340,6 @@ var DoughnutChart = function (_Component) {
 
     var _this = possibleConstructorReturn(this, (DoughnutChart.__proto__ || Object.getPrototypeOf(DoughnutChart)).call(this, props));
 
-    _this.animationTimer = null;
-
     _this.state = {
       segments: props.segments,
       oldSegments: props.segments,
@@ -327,6 +360,7 @@ var DoughnutChart = function (_Component) {
           dropShadow = _props.dropShadow,
           filters = _props.filters,
           segmentStyle = _props.segmentStyle,
+          animationDuration = _props.animationDuration,
           children = _props.children;
 
 
@@ -335,37 +369,30 @@ var DoughnutChart = function (_Component) {
 
       var segmentObjects = [];
 
-      //this means one was removed or stayed same so merge new into old with old getting 0 percent
-      if (oldSegmentObjects.length >= newsegmentObjects.length) {
-        segmentObjects = oldSegmentObjects.map(function (seg, idx) {
-          var relatedNewObj = newsegmentObjects[idx] || _extends({}, seg, {
-            offset: 100,
-            percent: 0
-          });
-          return _extends({}, seg, {
-            fromOffset: seg.offset,
-            offset: relatedNewObj.offset,
-            fromPercent: seg.percent,
-            percent: relatedNewObj.percent
-          });
+      // this means one was removed or it stayed same so merge new into old with old getting 0 percent
+      segmentObjects = oldSegmentObjects.length >= newsegmentObjects.length ? oldSegmentObjects.map(function (seg, idx) {
+        var relatedNewObj = newsegmentObjects[idx] || _extends({}, seg, {
+          offset: 100,
+          percent: 0
         });
-      }
-
-      //this means one was added
-      if (oldSegmentObjects.length < newsegmentObjects.length) {
-        segmentObjects = newsegmentObjects.map(function (seg, idx) {
-          var relatedOldObj = oldSegmentObjects[idx] || _extends({}, seg, {
-            offset: 100,
-            percent: 0
-          });
-          return _extends({}, seg, {
-            offset: seg.offset,
-            fromOffset: relatedOldObj.offset,
-            percent: seg.percent,
-            fromPercent: relatedOldObj.percent
-          });
+        return _extends({}, seg, {
+          fromOffset: seg.offset,
+          offset: relatedNewObj.offset,
+          fromPercent: seg.percent,
+          percent: relatedNewObj.percent
         });
-      }
+      }) : newsegmentObjects.map(function (seg, idx) {
+        var relatedOldObj = oldSegmentObjects[idx] || _extends({}, seg, {
+          offset: 100,
+          percent: 0
+        });
+        return _extends({}, seg, {
+          offset: seg.offset,
+          fromOffset: relatedOldObj.offset,
+          percent: seg.percent,
+          fromPercent: relatedOldObj.percent
+        });
+      });
 
       return React__default.createElement(
         'div',
@@ -394,11 +421,7 @@ var DoughnutChart = function (_Component) {
               fill: 'url(#drop)',
               stroke: 'transparent',
               strokeWidth: '0',
-              transform: 'scale(1.3,0.2)',
-              style: {
-                transition: 'opacity 0.5s ease-in-out',
-                opacity: 1
-              } })
+              transform: 'scale(1.3,0.2)' })
           ),
           React__default.createElement(
             'svg',
@@ -427,7 +450,8 @@ var DoughnutChart = function (_Component) {
                 isInital: _this2.state.isInital,
                 segmentStyle: segmentStyle,
                 showSeperator: segmentObject.showSeperator,
-                lineWidth: lineWidth });
+                lineWidth: lineWidth,
+                animationDuration: animationDuration });
             })
           ),
           React__default.createElement(
@@ -451,17 +475,22 @@ var DoughnutChart = function (_Component) {
   return DoughnutChart;
 }(React.Component);
 
-// DoughnutChart.propTypes = {
-//   // segments: PropTypes.array
-// }
-
 DoughnutChart.defaultProps = {
-  animate: true,
-  animationDuration: '1s',
-  lineWidth: '9',
+  animationDuration: '0.2s',
+  lineWidth: 9,
   dropShadow: false,
-  percentSpacing: 10,
-  segmentStyle: 'raised'
+  segmentStyle: 'flat',
+  filters: []
+};
+DoughnutChart.propTypes = {
+  children: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.string]),
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.array, PropTypes.object]),
+  segments: PropTypes.array.isRequired,
+  lineWidth: PropTypes.number,
+  dropShadow: PropTypes.bool,
+  filters: PropTypes.array,
+  animationDuration: PropTypes.string,
+  segmentStyle: PropTypes.oneOf(['flat', 'raised'])
 };
 
 module.exports = DoughnutChart;

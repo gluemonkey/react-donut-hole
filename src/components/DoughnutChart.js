@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import DoughnutChartSegment from './DoughnutChartSegment'
 import { sum } from '../utils'
 
@@ -71,15 +72,31 @@ const getSegmentConfigs = (segments, filters) => {
 
 class DoughnutChart extends Component {
   static defaultProps = {
-    animate: true,
-    animationDuration: '1s',
-    lineWidth: '9',
+    animationDuration: '0.2s',
+    lineWidth: 9,
     dropShadow: false,
-    percentSpacing: 10,
-    segmentStyle: 'raised'
+    segmentStyle: 'flat',
+    filters: []
   }
 
-  animationTimer = null;
+  static propTypes = {
+    children: PropTypes.oneOfType([
+      PropTypes.array,
+      PropTypes.object,
+      PropTypes.string
+    ]),
+    className: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.array,
+      PropTypes.object
+    ]),
+    segments: PropTypes.array.isRequired,
+    lineWidth: PropTypes.number,
+    dropShadow: PropTypes.bool,
+    filters: PropTypes.array,
+    animationDuration: PropTypes.string,
+    segmentStyle: PropTypes.oneOf(['flat', 'raised'])
+  }
 
   constructor(props) {
     super(props)
@@ -101,34 +118,37 @@ class DoughnutChart extends Component {
   }
 
   render() {
-    const { className, lineWidth, dropShadow, filters, segmentStyle, children } = this.props
+    const {
+      className,
+      lineWidth,
+      dropShadow,
+      filters,
+      segmentStyle,
+      animationDuration,
+      children
+    } = this.props
 
     const newsegmentObjects = getSegmentConfigs(this.state.segments, filters)
     const oldSegmentObjects = getSegmentConfigs(this.state.oldSegments, filters)
 
     let segmentObjects = []
 
-    //this means one was removed or stayed same so merge new into old with old getting 0 percent
-    if (oldSegmentObjects.length >= newsegmentObjects.length) {
-      segmentObjects = oldSegmentObjects.map((seg, idx) => {
-        const relatedNewObj = newsegmentObjects[idx] || {
-          ...seg,
-          offset: 100,
-          percent: 0
-        }
-        return {
-          ...seg,
-          fromOffset: seg.offset,
-          offset: relatedNewObj.offset,
-          fromPercent: seg.percent,
-          percent: relatedNewObj.percent
-        }
-      })
-    }
-
-    //this means one was added
-    if (oldSegmentObjects.length < newsegmentObjects.length) {
-      segmentObjects = newsegmentObjects.map((seg, idx) => {
+    // this means one was removed or it stayed same so merge new into old with old getting 0 percent
+    segmentObjects = oldSegmentObjects.length >= newsegmentObjects.length ? oldSegmentObjects.map((seg, idx) => {
+      const relatedNewObj = newsegmentObjects[idx] || {
+        ...seg,
+        offset: 100,
+        percent: 0
+      }
+      return {
+        ...seg,
+        fromOffset: seg.offset,
+        offset: relatedNewObj.offset,
+        fromPercent: seg.percent,
+        percent: relatedNewObj.percent
+      }
+    })
+      : newsegmentObjects.map((seg, idx) => {
         const relatedOldObj = oldSegmentObjects[idx] || {
           ...seg,
           offset: 100,
@@ -142,7 +162,6 @@ class DoughnutChart extends Component {
           fromPercent: relatedOldObj.percent
         }
       })
-    }
 
     return (
       <div className={className}>
@@ -163,11 +182,7 @@ class DoughnutChart extends Component {
                 fill='url(#drop)'
                 stroke='transparent'
                 strokeWidth='0'
-                transform='scale(1.3,0.2)'
-                style={{
-                  transition: 'opacity 0.5s ease-in-out',
-                  opacity: 1
-                }} />
+                transform='scale(1.3,0.2)' />
             </svg>
           }
           <svg width='100%' height='100%' viewBox='0 0 42 42' style={SVGStyle}>
@@ -191,7 +206,8 @@ class DoughnutChart extends Component {
                 isInital={this.state.isInital}
                 segmentStyle={segmentStyle}
                 showSeperator={segmentObject.showSeperator}
-                lineWidth={lineWidth} />
+                lineWidth={lineWidth}
+                animationDuration={animationDuration} />
             )}
           </svg>
           <div style={LabelContainerStyle}>
@@ -202,9 +218,5 @@ class DoughnutChart extends Component {
     )
   }
 }
-
-// DoughnutChart.propTypes = {
-//   // segments: PropTypes.array
-// }
 
 export default DoughnutChart
