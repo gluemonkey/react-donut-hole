@@ -1,6 +1,6 @@
 # react-doughnut-hole
 
-> A simple, friendly SVG doughnut chart
+> A simple, responsive, animated SVG doughnut chart
 
 [![NPM](https://img.shields.io/npm/v/react-doughnut-hole.svg)](https://www.npmjs.com/package/react-doughnut-hole) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
@@ -18,16 +18,20 @@ import React, { Component } from 'react'
 import DoughnutChart from 'react-doughnut-hole'
 
 const segments = [
-  {key: 'Pepperoni', value: 80, color: 'red'},
-  {key: 'Sausage', value: 80, color: 'green'},
-  {key: 'Mushroom', value: 80, color: 'blue'}
+  {key: 'Plain', value: 90, color: 'red'},
+  {key: 'Pink Frosting', value: 80, color: 'green'},
+  {key: 'Maple Frosting', value: 20, color: 'blue'},
+  {key: 'Grape Frosting', value: 10, color: 'purple'}
 ]
 
-class Example extends Component {
+export default class App extends Component {
   render () {
     return (
-      <div>
-        <DoughnutChart segments={segments} />
+        <div>
+          <DoughnutChart segments={segments} >
+            <div>Favorite Topping</div>
+          </DoughnutChart>
+        </div>
       </div>
     )
   }
