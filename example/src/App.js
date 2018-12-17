@@ -46,30 +46,30 @@ export default class App extends Component {
     return (
       <div>
         {segmentConfig == 0  &&
-          <div>
+          <div className={'buttonRow'}>
             <button onClick={() => this.setFilter('Plain')}>Toggle Plain</button>
             <button onClick={() => this.setFilter('Raspberry Filled')}>Toggle Raspberry Filled</button>
             <button onClick={() => this.setFilter('Blueberry Filled')}>Toggle Blueberry Filled</button>
           </div>
         }
         {segmentConfig == 1  &&
-          <div>
+          <div className={'buttonRow'}>
             <button onClick={() => this.setFilter('Round')}>Toggle Round</button>
             <button onClick={() => this.setFilter('Long')}>Toggle Long</button>
           </div>
         }
         {segmentConfig == 2  &&
-          <div>
+          <div className={'buttonRow'}>
             <button onClick={() => this.setFilter('Plain')}>Toggle Plain</button>
             <button onClick={() => this.setFilter('Pink Frosting')}>Toggle Pink Frosting</button>
             <button onClick={() => this.setFilter('Maple Frosting')}>Toggle Maple Frosting</button>
             <button onClick={() => this.setFilter('Grape Frosting')}>Toggle Grape Frosting</button>
           </div>
         }
-        <div>
+        <div className={'buttonRow'}>
           <button onClick={() => this.toggleChartType()}>Toggle Chart Type</button>
         </div>
-        <div style={{float: 'left', margin: 20, width: 300}}>
+        <div className={'chartContainer'}>
           <DoughnutChart 
             segments={segmentCats[segmentConfig]} 
             filters={filters}
@@ -78,7 +78,7 @@ export default class App extends Component {
             Raised Chart
           </DoughnutChart>
         </div>
-        <div style={{float: 'left', margin: 20, width: 300}}>
+        <div className={'chartContainer'}>
           <DoughnutChart 
             segments={segmentCats[segmentConfig]} 
             filters={filters}

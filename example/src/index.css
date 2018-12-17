@@ -3,3 +3,21 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+
+button {
+  margin-right: 10px;
+}
+
+h1 {
+  margin: 10px;
+}
+
+.buttonRow {
+  margin: 20px 10px;
+}
+
+.chartContainer {
+  float: left;
+  margin: 20px;
+  width: 300px;
+}

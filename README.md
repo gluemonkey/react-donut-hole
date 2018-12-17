@@ -40,6 +40,9 @@ export default class App extends Component {
 }
 
 ```
+## Children
+
+Children supplied to the component will be centered within the doughnut chart
 
 ## Props
 
