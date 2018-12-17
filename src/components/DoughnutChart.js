@@ -17,7 +17,7 @@ const LabelContainerStyle = {
 
 const CircleBoxStyle = {
   position: 'relative',
-  padding: '14px 30px 75% 30px'
+  padding: '14px 30px 94% 30px'
 }
 
 const SVGStyle = {
@@ -26,11 +26,9 @@ const SVGStyle = {
   left: 0
 }
 
-const segmentShown = (segment, props) => segment.value === 0 || props.filters.includes(segment.key)
+const segmentShown = (segment, filters) => segment.value === 0 || filters.includes(segment.key)
 
-const getSegmentConfigs = (props) => {
-  const { segments } = props
-
+const getSegmentConfigs = (segments, filters) => {
   let segmentObjects = []
   let segmentPercentage = 0
   let remainderPercentage = 0
@@ -41,7 +39,7 @@ const getSegmentConfigs = (props) => {
   segments.forEach((segment) => {
     const { value } = segment
     const percent = (value / total) * 100
-    if (segmentShown(segment, props)) {
+    if (segmentShown(segment, filters)) {
       remainderPercentage += percent
       hiddenSegmentCount += 1
     }
@@ -53,7 +51,7 @@ const getSegmentConfigs = (props) => {
     const { value, color } = segment
     const percent = (value / total) * 100
     let segPercent = eachSectionGets + percent
-    if (segmentShown(segment, props)) {
+    if (segmentShown(segment, filters)) {
       segPercent = 0
     };
 
@@ -73,18 +71,12 @@ const getSegmentConfigs = (props) => {
 
 class DoughnutChart extends Component {
   static defaultProps = {
-    progress: 0,
     animate: true,
     animationDuration: '1s',
-    showPercentage: true,
-    showPercentageSymbol: true,
-    progressColor: '#000',
-    bgColor: '#000',
-    textColor: '#6b778c',
-    size: '400',
     lineWidth: '9',
-    dropShadow: true,
-    percentSpacing: 10
+    dropShadow: false,
+    percentSpacing: 10,
+    segmentStyle: 'raised'
   }
 
   animationTimer = null;
@@ -92,53 +84,71 @@ class DoughnutChart extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      segments: [],
-      fitlers: [],
+      segments: props.segments,
+      oldSegments: props.segments,
+      filters: [],
       isInital: true
     }
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (props.segments.length < state.segments.length) {
-      const splicedSegments = state.segments.slice(-(state.segments.length - props.segments.length)).map((seg) => { return {...seg, ...{value: 0}} })
-      const calcSegments = [...props.segments, ...splicedSegments]
-      return {
-        ...state,
-        segments: calcSegments,
-        filters: props.filters
-      }
-    }
-
     return {
       ...state,
+      filters: props.filters,
       segments: props.segments,
-      filters: props.filters
-    }
-  }
-
-  componentDidMount() {
-    setTimeout(() => {
-      this.setState({ isInital: false })
-    }, 500)
-  }
-
-  onSegmentAnimationComplete = (segId) => {
-    const found = this.props.segments.findIndex((segment) => segment.segId === segId) !== -1
-    if (!found) {
-      this.setState({segments: this.state.segments.filter((seg) => seg.id !== segId)})
+      oldSegments: state.segments
     }
   }
 
   render() {
-    const { className, show, lineWidth, dropShadow } = this.props
+    const { className, lineWidth, dropShadow, filters, segmentStyle, children } = this.props
 
-    let segmentObjects = getSegmentConfigs(this.state)
+    const newsegmentObjects = getSegmentConfigs(this.state.segments, filters)
+    const oldSegmentObjects = getSegmentConfigs(this.state.oldSegments, filters)
+
+    let segmentObjects = []
+
+    //this means one was removed or stayed same so merge new into old with old getting 0 percent
+    if (oldSegmentObjects.length >= newsegmentObjects.length) {
+      segmentObjects = oldSegmentObjects.map((seg, idx) => {
+        const relatedNewObj = newsegmentObjects[idx] || {
+          ...seg,
+          offset: 100,
+          percent: 0
+        }
+        return {
+          ...seg,
+          fromOffset: seg.offset,
+          offset: relatedNewObj.offset,
+          fromPercent: seg.percent,
+          percent: relatedNewObj.percent
+        }
+      })
+    }
+
+    //this means one was added
+    if (oldSegmentObjects.length < newsegmentObjects.length) {
+      segmentObjects = newsegmentObjects.map((seg, idx) => {
+        const relatedOldObj = oldSegmentObjects[idx] || {
+          ...seg,
+          offset: 100,
+          percent: 0
+        }
+        return {
+          ...seg,
+          offset: seg.offset,
+          fromOffset: relatedOldObj.offset,
+          percent: seg.percent,
+          fromPercent: relatedOldObj.percent
+        }
+      })
+    }
 
     return (
       <div className={className}>
         <div style={CircleBoxStyle}>
           {dropShadow &&
-            <svg width='100%' height='100%' viewBox='0 0 42 46' style={SVGStyle}>
+            <svg width='100%' viewBox='0 0 42 46' style={SVGStyle}>
               <defs>
                 <radialGradient id='drop' cx='50%' cy='50%' r='100%' fx='50%' fy='50%'>
                   <stop offset='0%' stopColor='#000' stopOpacity='0.4' />
@@ -156,7 +166,7 @@ class DoughnutChart extends Component {
                 transform='scale(1.3,0.2)'
                 style={{
                   transition: 'opacity 0.5s ease-in-out',
-                  opacity: show ? 1 : 0
+                  opacity: 1
                 }} />
             </svg>
           }
@@ -172,18 +182,20 @@ class DoughnutChart extends Component {
               <DoughnutChartSegment
                 segmentShown={segmentObject.shown}
                 percent={segmentObject.percent}
+                fromPercent={segmentObject.fromPercent}
                 offset={segmentObject.offset}
+                fromOffset={segmentObject.fromOffset}
                 delay={segmentObject.delay}
                 color={segmentObject.color}
                 segId={segmentObject.segId}
                 isInital={this.state.isInital}
+                segmentStyle={segmentStyle}
                 showSeperator={segmentObject.showSeperator}
-                onAnimationComplete={this.onSegmentAnimationComplete}
                 lineWidth={lineWidth} />
             )}
           </svg>
           <div style={LabelContainerStyle}>
-            <p>Label Here</p>
+            {children}
           </div>
         </div>
       </div>
