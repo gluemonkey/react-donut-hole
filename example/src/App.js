@@ -3,15 +3,15 @@ import React, { Component } from 'react'
 import DoughnutChart from 'react-doughnut-hole'
 
 const fillingSegments = [
-  {key: 'Plain', value: 80, color: 'red'},
-  {key: 'Raspberry Filled', value: 80, color: 'green'},
-  {key: 'Blueberry Filled', value: 80, color: 'blue'}
+  {key: 'Plain', value: 80, color: 'red', segId: 1},
+  {key: 'Raspberry Filled', value: 80, color: 'green', segId: 2},
+  {key: 'Blueberry Filled', value: 80, color: 'blue', segId: 3}
 ]
 
 const toppingSegments = [
-  {key: 'Plain', value: 90, color: 'red'},
-  {key: 'Pink Frosting', value: 80, color: 'green'},
-  {key: 'Maple Frosting', value: 20, color: 'blue'}
+  {key: 'Plain', value: 90, color: 'red', segId: 1},
+  {key: 'Pink Frosting', value: 80, color: 'green', segId: 2},
+  // {key: 'Maple Frosting', value: 20, color: 'blue'}
 ]
 
 export default class App extends Component {
@@ -54,7 +54,7 @@ export default class App extends Component {
         <div>
           <button onClick={() => this.toggleChartType()}>Toggle Chart Type</button>
         </div>
-        <div>
+        <div style={{width: 300}}>
           <DoughnutChart segments={segments} filters={filters} />
         </div>
       </div>

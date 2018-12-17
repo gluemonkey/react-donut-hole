@@ -74,6 +74,16 @@ var possibleConstructorReturn = function (self, call) {
   return call && (typeof call === "object" || typeof call === "function") ? call : self;
 };
 
+var toConsumableArray = function (arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
+};
+
 var CircleElement = function CircleElement(_ref) {
   var children = _ref.children,
       dasharray = _ref.dasharray,
@@ -109,36 +119,62 @@ var DoughnutChartSegment = function (_Component) {
 
     var _this = possibleConstructorReturn(this, (DoughnutChartSegment.__proto__ || Object.getPrototypeOf(DoughnutChartSegment)).call(this, props));
 
+    _this.animationTimeout = null;
+
     _this.state = {
-      isVisible: false,
-      shown: false,
-      percentage: 0
+      animate: false
     };
     return _this;
   }
 
   createClass(DoughnutChartSegment, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      setTimeout(function () {
+        _this2.setState({ animate: true });
+      }, 0);
+    }
+  }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate(prevProps, prevState, snapshot) {
+      var _this3 = this;
+
+      if (this.props.percent === 0) {
+        clearTimeout(this.animationTimeout);
+        this.animationTimeout = setTimeout(function () {
+          return _this3.props.onAnimationComplete(_this3.props.segId);
+        }, 300);
+      }
+      if (!this.state.animate) {
+        requestAnimationFrame(function () {
+          debugger;
+          _this3.setState({ animate: true });
+        });
+      }
+    }
+  }, {
     key: 'render',
     value: function render() {
       var _props = this.props,
           percent = _props.percent,
+          isInital = _props.isInital,
           offset = _props.offset,
           color = _props.color,
           lineWidth = _props.lineWidth,
-          delay = _props.delay,
-          showSeperator = _props.showSeperator,
-          segmentShown = _props.segmentShown;
+          showSeperator = _props.showSeperator;
+      var animate = this.state.animate;
 
-      var segmentOffset = 25;
+      var segmentOffset = 0;
       var seperatorPercentage = showSeperator ? 0.7 : 0;
-      var mainSegPercentage = Math.max(0, percent - seperatorPercentage);
+      var mainSegPercentage = animate || isInital ? Math.max(0, percent - seperatorPercentage) : 0;
 
       var mainSegmentConfig = {
         dasharray: mainSegPercentage + ' ' + (100 - mainSegPercentage),
         rotation: (offset + segmentOffset) / 100 * 360,
         dashoffset: '0',
         color: color
-        // delay: delay,
       };
 
       var segmentContainerStyle = {
@@ -147,12 +183,9 @@ var DoughnutChartSegment = function (_Component) {
         transitionDuration: '0.3s',
         transitionDelay: '0s',
         transitionTimingFunction: 'linear',
-        // opacity: (shown ? 1 : 0),
         opacity: 1,
         transform: 'rotate(' + mainSegmentConfig.rotation + 'deg)'
       };
-
-      console.log(mainSegmentConfig.rotation);
 
       return React.createElement(
         'g',
@@ -163,15 +196,13 @@ var DoughnutChartSegment = function (_Component) {
           r: '15.91549430918953357688837633725143',
           fill: 'transparent',
           stroke: mainSegmentConfig.color,
-          strokeWidth: lineWidth
-          // opacity={segmentShown ? 1 : 0}
-          , dasharray: mainSegmentConfig.dasharray,
+          strokeWidth: lineWidth,
+          dasharray: mainSegmentConfig.dasharray,
           dashoffset: mainSegmentConfig.dashoffset }),
         React.createElement(CircleElement, {
           cx: '21',
-          cy: '21'
-          // opacity={segmentShown ? 1 : 0}
-          , r: '15.91549430918953357688837633725143',
+          cy: '21',
+          r: '15.91549430918953357688837633725143',
           fill: 'transparent',
           stroke: 'url(#grad1)',
           strokeWidth: lineWidth,
@@ -188,16 +219,6 @@ var add = function add(a, b) {
 };
 var sum = function sum(value) {
   return value.reduce(add);
-};
-
-var ContainerStyle = {
-  position: 'relative',
-  maxWidth: '260px',
-  color: 'white',
-  border: '1px solid #cccccc',
-  borderRadius: '6px',
-  overflow: 'hidden',
-  margin: '18px'
 };
 
 var LabelContainerStyle = {
@@ -235,8 +256,7 @@ var getSegmentConfigs = function getSegmentConfigs(props) {
   var segmentObjects = [];
   var segmentPercentage = 0;
   var remainderPercentage = 0;
-  var unshown = 0;
-  var int = 0;
+  var hiddenSegmentCount = 0;
 
   var total = sum(segments.map(function (seg) {
     return seg.value;
@@ -248,11 +268,11 @@ var getSegmentConfigs = function getSegmentConfigs(props) {
     var percent = value / total * 100;
     if (segmentShown(segment, props)) {
       remainderPercentage += percent;
-      unshown += 1;
+      hiddenSegmentCount += 1;
     }
   });
 
-  var eachSectionGets = remainderPercentage / (segments.length - unshown);
+  var eachSectionGets = remainderPercentage / (segments.length - hiddenSegmentCount);
 
   segments.forEach(function (segment) {
     var value = segment.value,
@@ -267,12 +287,10 @@ var getSegmentConfigs = function getSegmentConfigs(props) {
       percent: segPercent,
       offset: segmentPercentage,
       color: color,
-      delay: int * 0.3 + 0.1,
-      showSeperator: unshown < 2,
+      showSeperator: hiddenSegmentCount < segments.length - 1,
       shown: percent !== 0
     });
 
-    int += 1;
     segmentPercentage += segPercent;
   });
 
@@ -287,17 +305,41 @@ var DoughnutChart = function (_Component) {
 
     var _this = possibleConstructorReturn(this, (DoughnutChart.__proto__ || Object.getPrototypeOf(DoughnutChart)).call(this, props));
 
+    _this.animationTimer = null;
+
+    _this.onSegmentAnimationComplete = function (segId) {
+      var found = _this.props.segments.findIndex(function (segment) {
+        return segment.segId === segId;
+      }) !== -1;
+      if (!found) {
+        _this.setState({ segments: _this.state.segments.filter(function (seg) {
+            return seg.id !== segId;
+          }) });
+      }
+    };
+
     _this.state = {
-      isVisible: false,
-      shown: false,
-      percentage: 0
+      segments: [],
+      fitlers: [],
+      isInital: true
     };
     return _this;
   }
 
   createClass(DoughnutChart, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      setTimeout(function () {
+        _this2.setState({ isInital: false });
+      }, 500);
+    }
+  }, {
     key: 'render',
     value: function render() {
+      var _this3 = this;
+
       var _props = this.props,
           className = _props.className,
           show = _props.show,
@@ -305,81 +347,99 @@ var DoughnutChart = function (_Component) {
           dropShadow = _props.dropShadow;
 
 
-      var segmentObjects = getSegmentConfigs(this.props);
+      var segmentObjects = getSegmentConfigs(this.state);
 
       return React.createElement(
         'div',
         { className: className },
         React.createElement(
           'div',
-          { style: ContainerStyle },
+          { style: CircleBoxStyle },
+          dropShadow && React.createElement(
+            'svg',
+            { width: '100%', height: '100%', viewBox: '0 0 42 46', style: SVGStyle },
+            React.createElement(
+              'defs',
+              null,
+              React.createElement(
+                'radialGradient',
+                { id: 'drop', cx: '50%', cy: '50%', r: '100%', fx: '50%', fy: '50%' },
+                React.createElement('stop', { offset: '0%', stopColor: '#000', stopOpacity: '0.4' }),
+                React.createElement('stop', { offset: '40%', stopColor: '#000', stopOpacity: '0' })
+              )
+            ),
+            React.createElement('circle', {
+              cx: '16.4',
+              cy: '206',
+              className: 'shadow',
+              r: '15.91549430918954',
+              fill: 'url(#drop)',
+              stroke: 'transparent',
+              strokeWidth: '0',
+              transform: 'scale(1.3,0.2)',
+              style: {
+                transition: 'opacity 0.5s ease-in-out',
+                opacity: show ? 1 : 0
+              } })
+          ),
+          React.createElement(
+            'svg',
+            { width: '100%', height: '100%', viewBox: '0 0 42 42', style: SVGStyle },
+            React.createElement(
+              'defs',
+              null,
+              React.createElement(
+                'radialGradient',
+                { id: 'grad1', cx: '50%', cy: '50%', r: '100%', fx: '50%', fy: '50%' },
+                React.createElement('stop', { offset: '20%', stopColor: '#000', stopOpacity: '0.5' }),
+                React.createElement('stop', { offset: '50%', stopColor: '#000', stopOpacity: '0' }),
+                React.createElement('stop', { offset: '80%', stopColor: '#000', stopOpacity: '0.5' })
+              )
+            ),
+            segmentObjects.map(function (segmentObject) {
+              return React.createElement(DoughnutChartSegment, {
+                segmentShown: segmentObject.shown,
+                percent: segmentObject.percent,
+                offset: segmentObject.offset,
+                delay: segmentObject.delay,
+                color: segmentObject.color,
+                segId: segmentObject.segId,
+                isInital: _this3.state.isInital,
+                showSeperator: segmentObject.showSeperator,
+                onAnimationComplete: _this3.onSegmentAnimationComplete,
+                lineWidth: lineWidth });
+            })
+          ),
           React.createElement(
             'div',
-            { style: CircleBoxStyle },
-            dropShadow && React.createElement(
-              'svg',
-              { width: '100%', height: '100%', viewBox: '0 0 42 46', style: SVGStyle },
-              React.createElement(
-                'defs',
-                null,
-                React.createElement(
-                  'radialGradient',
-                  { id: 'drop', cx: '50%', cy: '50%', r: '100%', fx: '50%', fy: '50%' },
-                  React.createElement('stop', { offset: '0%', stopColor: '#000', stopOpacity: '0.4' }),
-                  React.createElement('stop', { offset: '40%', stopColor: '#000', stopOpacity: '0' })
-                )
-              ),
-              React.createElement('circle', {
-                cx: '16.4',
-                cy: '206',
-                className: 'shadow',
-                r: '15.91549430918954',
-                fill: 'url(#drop)',
-                stroke: 'transparent',
-                strokeWidth: '0',
-                transform: 'scale(1.3,0.2)',
-                style: {
-                  transition: 'opacity 0.5s ease-in-out',
-                  opacity: show ? 1 : 0
-                } })
-            ),
+            { style: LabelContainerStyle },
             React.createElement(
-              'svg',
-              { width: '100%', height: '100%', viewBox: '0 0 42 42', style: SVGStyle },
-              React.createElement(
-                'defs',
-                null,
-                React.createElement(
-                  'radialGradient',
-                  { id: 'grad1', cx: '50%', cy: '50%', r: '100%', fx: '50%', fy: '50%' },
-                  React.createElement('stop', { offset: '20%', stopColor: '#000', stopOpacity: '0.5' }),
-                  React.createElement('stop', { offset: '50%', stopColor: '#000', stopOpacity: '0' }),
-                  React.createElement('stop', { offset: '80%', stopColor: '#000', stopOpacity: '0.5' })
-                )
-              ),
-              segmentObjects.map(function (segmentObject) {
-                return React.createElement(DoughnutChartSegment, {
-                  segmentShown: segmentObject.shown,
-                  percent: segmentObject.percent,
-                  offset: segmentObject.offset,
-                  delay: segmentObject.delay,
-                  color: segmentObject.color,
-                  showSeperator: segmentObject.showSeperator,
-                  lineWidth: lineWidth });
-              })
-            ),
-            React.createElement(
-              'div',
-              { style: LabelContainerStyle },
-              React.createElement(
-                'p',
-                null,
-                'Label Here'
-              )
+              'p',
+              null,
+              'Label Here'
             )
           )
         )
       );
+    }
+  }], [{
+    key: 'getDerivedStateFromProps',
+    value: function getDerivedStateFromProps(props, state) {
+      if (props.segments.length < state.segments.length) {
+        var splicedSegments = state.segments.slice(-(state.segments.length - props.segments.length)).map(function (seg) {
+          return _extends({}, seg, { value: 0 });
+        });
+        var calcSegments = [].concat(toConsumableArray(props.segments), toConsumableArray(splicedSegments));
+        return _extends({}, state, {
+          segments: calcSegments,
+          filters: props.filters
+        });
+      }
+
+      return _extends({}, state, {
+        segments: props.segments,
+        filters: props.filters
+      });
     }
   }]);
   return DoughnutChart;
