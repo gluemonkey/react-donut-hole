@@ -12,6 +12,8 @@ npm install --save react-doughnut-hole
 
 ## Usage
 
+[View Example](https://gluemonkey.github.io/react-doughnut-hole)
+
 ```jsx
 import React, { Component } from 'react'
 
