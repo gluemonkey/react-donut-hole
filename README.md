@@ -1,23 +1,23 @@
-# react-doughnut-hole
+# react-donut-hole
 
-> A simple, responsive, animated SVG doughnut chart
+> A simple, responsive, animated SVG donut chart
 
-[![NPM](https://img.shields.io/npm/v/react-doughnut-hole.svg)](https://www.npmjs.com/package/react-doughnut-hole) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+[![NPM](https://img.shields.io/npm/v/react-donut-hole.svg)](https://www.npmjs.com/package/react-donut-hole) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 ## Install
 
 ```bash
-npm install --save react-doughnut-hole
+npm install --save react-donut-hole
 ```
 
 ## Usage
 
-[View Example](https://gluemonkey.github.io/react-doughnut-hole)
+[View Example](https://gluemonkey.github.io/react-donut-hole)
 
 ```jsx
 import React, { Component } from 'react'
 
-import DoughnutChart from 'react-doughnut-hole'
+import DonutChart from 'react-donut-hole'
 
 const segments = [
   {key: 'Plain', value: 90, color: 'red'},
@@ -30,9 +30,9 @@ export default class App extends Component {
   render () {
     return (
         <div>
-          <DoughnutChart segments={segments} >
+          <DonutChart segments={segments} >
             <div>Favorite Topping</div>
-          </DoughnutChart>
+          </DonutChart>
         </div>
       </div>
     )
@@ -42,7 +42,7 @@ export default class App extends Component {
 ```
 ## Children
 
-Children supplied to the component will be centered within the doughnut chart
+Children supplied to the component will be centered within the donut chart
 
 ## Props
 
@@ -72,7 +72,7 @@ Time spent animating between segment values when provided to the component.
 
 > default: `9`
 
-Specifies the relative thickness of the doughnut
+Specifies the relative thickness of the donut
 
 #### dropShadow: `boolean`
 
