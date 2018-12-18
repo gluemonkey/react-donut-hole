@@ -69,6 +69,8 @@ class DoughnutChartSegment extends Component {
     const initialSegmentConfig = calcSegmentConfig(fromPercent, fromOffset, this.props)
     const toSegmentConfig = calcSegmentConfig(percent, offset, this.props)
 
+    const groupRotate = animate ? toSegmentConfig.rotation : initialSegmentConfig.rotation
+
     const segmentContainerStyle = {
       transformOrigin: 'center 50%',
       transitionProperty: 'all',
@@ -80,7 +82,7 @@ class DoughnutChartSegment extends Component {
     }
 
     return (
-      <g style={segmentContainerStyle}>
+      <g style={segmentContainerStyle} transform={`rotate(${groupRotate} 21 21)`}>
         <DoughnutChartSegmentElement
           cx='21'
           cy='21'

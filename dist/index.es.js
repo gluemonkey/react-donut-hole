@@ -196,6 +196,8 @@ var DoughnutChartSegment = function (_Component) {
       var initialSegmentConfig = calcSegmentConfig(fromPercent, fromOffset, this.props);
       var toSegmentConfig = calcSegmentConfig(percent, offset, this.props);
 
+      var groupRotate = animate ? toSegmentConfig.rotation : initialSegmentConfig.rotation;
+
       var segmentContainerStyle = {
         transformOrigin: 'center 50%',
         transitionProperty: 'all',
@@ -208,7 +210,7 @@ var DoughnutChartSegment = function (_Component) {
 
       return React.createElement(
         'g',
-        { style: segmentContainerStyle },
+        { style: segmentContainerStyle, transform: 'rotate(' + groupRotate + ' 21 21)' },
         React.createElement(CircleElement, {
           cx: '21',
           cy: '21',
@@ -371,6 +373,7 @@ var DoughnutChart = function (_Component) {
           percent: 0
         });
         return _extends({}, seg, {
+          color: relatedNewObj.color,
           fromOffset: seg.offset,
           offset: relatedNewObj.offset,
           fromPercent: seg.percent,

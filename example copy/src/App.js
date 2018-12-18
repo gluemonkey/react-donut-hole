@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+
 import DoughnutChart from 'react-doughnut-hole'
 
 const fillingSegments = [
@@ -49,28 +50,28 @@ export default class App extends Component {
     return (
       <div>
         {segmentConfig == 0  &&
-          <div className={'toggleButtonRow'}>
+          <div className={'buttonRow'}>
             <ToggleButton active={this.notFiltered('Plain')} onClick={() => this.setFilter('Plain')}>Plain</ToggleButton>
             <ToggleButton active={this.notFiltered('Raspberry Filled')} onClick={() => this.setFilter('Raspberry Filled')}>Raspberry Filled</ToggleButton>
             <ToggleButton active={this.notFiltered('Blueberry Filled')} onClick={() => this.setFilter('Blueberry Filled')}>Blueberry Filled</ToggleButton>
           </div>
         }
         {segmentConfig == 1  &&
-          <div className={'toggleButtonRow'}>
+          <div className={'ToggleButtonRow'}>
             <ToggleButton active={this.notFiltered('Round')} onClick={() => this.setFilter('Round')}>Round</ToggleButton>
             <ToggleButton active={this.notFiltered('Long')} onClick={() => this.setFilter('Long')}>Long</ToggleButton>
           </div>
         }
         {segmentConfig == 2  &&
-          <div className={'toggleButtonRow'}>
+          <div className={'ToggleButtonRow'}>
             <ToggleButton active={this.notFiltered('Plain')} onClick={() => this.setFilter('Plain')}>Plain</ToggleButton>
             <ToggleButton active={this.notFiltered('Pink Frosting')} onClick={() => this.setFilter('Pink Frosting')}>Pink Frosting</ToggleButton>
             <ToggleButton active={this.notFiltered('Maple Frosting')} onClick={() => this.setFilter('Maple Frosting')}>Maple Frosting</ToggleButton>
             <ToggleButton active={this.notFiltered('Grape Frosting')} onClick={() => this.setFilter('Grape Frosting')}>Grape Frosting</ToggleButton>
           </div>
         }
-        <div className={'toggleButtonRow'}>
-          <div className={'toggle -chart-type'} onClick={() => this.toggleChartType()}>Toggle Chart Type</div>
+        <div className={'buttonRow'}>
+          <button onClick={() => this.toggleChartType()}>Toggle Chart Type</button>
         </div>
         <div className={'chartContainer'}>
           <DoughnutChart 

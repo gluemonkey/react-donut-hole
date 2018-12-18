@@ -142,6 +142,7 @@ class DoughnutChart extends Component {
       }
       return {
         ...seg,
+        color: relatedNewObj.color,
         fromOffset: seg.offset,
         offset: relatedNewObj.offset,
         fromPercent: seg.percent,
