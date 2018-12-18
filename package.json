@@ -1,10 +1,10 @@
 {
-  "name": "react-doughnut-hole",
+  "name": "react-donut-hole",
   "version": "1.0.0",
-  "description": "A simple, friendly SVG doughnut chart",
+  "description": "A simple, responsive, animated SVG donut chart",
   "author": "gluemonkey",
   "license": "MIT",
-  "repository": "gluemonkey/react-doughnut-hole",
+  "repository": "gluemonkey/react-donut-hole",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "jsnext:main": "dist/index.es.js",

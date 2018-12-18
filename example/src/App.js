@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import DoughnutChart from 'react-doughnut-hole'
+import DonutChart from 'react-donut-hole'
 
 const fillingSegments = [
   {key: 'Plain', value: 80, color: 'tan'},
@@ -73,21 +73,21 @@ export default class App extends Component {
           <div className={'toggle -chart-type'} onClick={() => this.toggleChartType()}>Toggle Chart Type</div>
         </div>
         <div className={'chartContainer'}>
-          <DoughnutChart 
+          <DonutChart 
             segments={segmentCats[segmentConfig]} 
             filters={filters}
             segmentStyle={'raised'}
             dropShadow>
             Raised Chart
-          </DoughnutChart>
+          </DonutChart>
         </div>
         <div className={'chartContainer'}>
-          <DoughnutChart 
+          <DonutChart 
             segments={segmentCats[segmentConfig]} 
             filters={filters}
             segmentStyle={'flat'}>
             Flat Chart
-          </DoughnutChart>
+          </DonutChart>
         </div>
       </div>
     )

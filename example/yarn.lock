@@ -6708,7 +6708,7 @@ react-dom@^16.6.3:
     prop-types "^15.6.2"
     scheduler "^0.11.2"
 
-"react-doughnut-hole@link:..":
+"react-donut-hole@link:..":
   version "0.0.0"
   uid ""
 

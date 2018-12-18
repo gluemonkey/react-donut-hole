@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import DoughnutChartSegment from './DoughnutChartSegment'
+import DonutChartSegment from './DonutChartSegment'
 import { sum } from '../utils'
 
 const LabelContainerStyle = {
@@ -70,7 +70,7 @@ const getSegmentConfigs = (segments, filters) => {
   return segmentObjects
 }
 
-class DoughnutChart extends Component {
+class DonutChart extends Component {
   static defaultProps = {
     animationDuration: '0.2s',
     lineWidth: 9,
@@ -195,7 +195,7 @@ class DoughnutChart extends Component {
               </radialGradient>
             </defs>
             {segmentObjects.map((segmentObject) =>
-              <DoughnutChartSegment
+              <DonutChartSegment
                 segmentShown={segmentObject.shown}
                 percent={segmentObject.percent}
                 fromPercent={segmentObject.fromPercent}
@@ -220,4 +220,4 @@ class DoughnutChart extends Component {
   }
 }
 
-export default DoughnutChart
+export default DonutChart

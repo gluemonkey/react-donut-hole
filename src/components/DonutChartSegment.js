@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 
 import PropTypes from 'prop-types'
 
-import DoughnutChartSegmentElement from './DoughnutChartSegmentElement'
+import DonutChartSegmentElement from './DonutChartSegmentElement'
 
 const calcSegmentConfig = (percent, offset, props) => {
   const { color, showSeperator } = props
@@ -18,7 +18,7 @@ const calcSegmentConfig = (percent, offset, props) => {
   }
 }
 
-class DoughnutChartSegment extends Component {
+class DonutChartSegment extends Component {
   static propTypes = {
     percent: PropTypes.number.isRequired,
     fromPercent: PropTypes.number.isRequired,
@@ -83,7 +83,7 @@ class DoughnutChartSegment extends Component {
 
     return (
       <g style={segmentContainerStyle} transform={`rotate(${groupRotate} 21 21)`}>
-        <DoughnutChartSegmentElement
+        <DonutChartSegmentElement
           cx='21'
           cy='21'
           r='15.91549430918953357688837633725143'
@@ -95,7 +95,7 @@ class DoughnutChartSegment extends Component {
           animationDuration={animationDuration}
           animatedSegmentConfig={toSegmentConfig} />
         {segmentStyle === 'raised' &&
-          <DoughnutChartSegmentElement
+          <DonutChartSegmentElement
             cx='21'
             cy='21'
             r='15.91549430918953357688837633725143'
@@ -112,4 +112,4 @@ class DoughnutChartSegment extends Component {
   }
 }
 
-export default DoughnutChartSegment
+export default DonutChartSegment

@@ -6,7 +6,7 @@
     "core-js": "^2.6.1",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
-    "react-doughnut-hole": "link:..",
+    "react-donut-hole": "link:..",
     "react-scripts": "2.1.1"
   },
   "scripts": {

@@ -143,13 +143,13 @@ var calcSegmentConfig = function calcSegmentConfig(percent, offset, props) {
   };
 };
 
-var DoughnutChartSegment = function (_Component) {
-  inherits(DoughnutChartSegment, _Component);
+var DonutChartSegment = function (_Component) {
+  inherits(DonutChartSegment, _Component);
 
-  function DoughnutChartSegment(props) {
-    classCallCheck(this, DoughnutChartSegment);
+  function DonutChartSegment(props) {
+    classCallCheck(this, DonutChartSegment);
 
-    var _this = possibleConstructorReturn(this, (DoughnutChartSegment.__proto__ || Object.getPrototypeOf(DoughnutChartSegment)).call(this, props));
+    var _this = possibleConstructorReturn(this, (DonutChartSegment.__proto__ || Object.getPrototypeOf(DonutChartSegment)).call(this, props));
 
     _this.state = {
       animate: false
@@ -157,7 +157,7 @@ var DoughnutChartSegment = function (_Component) {
     return _this;
   }
 
-  createClass(DoughnutChartSegment, [{
+  createClass(DonutChartSegment, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
       var _this2 = this;
@@ -241,10 +241,10 @@ var DoughnutChartSegment = function (_Component) {
       );
     }
   }]);
-  return DoughnutChartSegment;
+  return DonutChartSegment;
 }(React.Component);
 
-DoughnutChartSegment.propTypes = {
+DonutChartSegment.propTypes = {
   percent: PropTypes.number.isRequired,
   fromPercent: PropTypes.number.isRequired,
   offset: PropTypes.number.isRequired,
@@ -334,13 +334,13 @@ var getSegmentConfigs = function getSegmentConfigs(segments, filters) {
   return segmentObjects;
 };
 
-var DoughnutChart = function (_Component) {
-  inherits(DoughnutChart, _Component);
+var DonutChart = function (_Component) {
+  inherits(DonutChart, _Component);
 
-  function DoughnutChart(props) {
-    classCallCheck(this, DoughnutChart);
+  function DonutChart(props) {
+    classCallCheck(this, DonutChart);
 
-    var _this = possibleConstructorReturn(this, (DoughnutChart.__proto__ || Object.getPrototypeOf(DoughnutChart)).call(this, props));
+    var _this = possibleConstructorReturn(this, (DonutChart.__proto__ || Object.getPrototypeOf(DonutChart)).call(this, props));
 
     _this.state = {
       segments: props.segments,
@@ -351,7 +351,7 @@ var DoughnutChart = function (_Component) {
     return _this;
   }
 
-  createClass(DoughnutChart, [{
+  createClass(DonutChart, [{
     key: 'render',
     value: function render() {
       var _this2 = this;
@@ -441,7 +441,7 @@ var DoughnutChart = function (_Component) {
               )
             ),
             segmentObjects.map(function (segmentObject) {
-              return React__default.createElement(DoughnutChartSegment, {
+              return React__default.createElement(DonutChartSegment, {
                 segmentShown: segmentObject.shown,
                 percent: segmentObject.percent,
                 fromPercent: segmentObject.fromPercent,
@@ -475,17 +475,17 @@ var DoughnutChart = function (_Component) {
       });
     }
   }]);
-  return DoughnutChart;
+  return DonutChart;
 }(React.Component);
 
-DoughnutChart.defaultProps = {
+DonutChart.defaultProps = {
   animationDuration: '0.2s',
   lineWidth: 9,
   dropShadow: false,
   segmentStyle: 'flat',
   filters: []
 };
-DoughnutChart.propTypes = {
+DonutChart.propTypes = {
   children: PropTypes.oneOfType([PropTypes.array, PropTypes.object, PropTypes.string]),
   className: PropTypes.oneOfType([PropTypes.string, PropTypes.array, PropTypes.object]),
   segments: PropTypes.array.isRequired,
@@ -496,5 +496,5 @@ DoughnutChart.propTypes = {
   segmentStyle: PropTypes.oneOf(['flat', 'raised'])
 };
 
-module.exports = DoughnutChart;
+module.exports = DonutChart;
 //# sourceMappingURL=index.js.map
