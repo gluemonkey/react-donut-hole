@@ -23,18 +23,23 @@ const segments = [
   {key: 'Plain', value: 90, color: 'red'},
   {key: 'Pink Frosting', value: 80, color: 'green'},
   {key: 'Maple Frosting', value: 20, color: 'blue'},
-  {key: 'Grape Frosting', value: 10, color: 'purple'}
+  {key: 'Grape Frosting', value: 10, color: 'purple'},
+  {key: 'Not Shown Frosting', value: 1000, color: 'yellow'}
 ]
 
 export default class App extends Component {
   render () {
     return (
         <div>
-          <DonutChart segments={segments} >
+          <DonutChart 
+            segments={segments} 
+            filters={['Not Shown Frosting']}
+            segmentStyle="raised"
+            animationDuration={'0.5s'}
+            dropShadow>
             <div>Favorite Topping</div>
           </DonutChart>
         </div>
-      </div>
     )
   }
 }
