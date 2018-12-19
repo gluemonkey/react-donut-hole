@@ -61,7 +61,7 @@ const getSegmentConfigs = (segments, filters) => {
       offset: segmentPercentage,
       color: color,
       showSeperator: hiddenSegmentCount < segments.length - 1,
-      shown: percent !== 0
+      shown: !segmentShown(segment, filters)
     })
 
     segmentPercentage += segPercent
@@ -138,15 +138,15 @@ class DonutChart extends Component {
       const relatedNewObj = newsegmentObjects[idx] || {
         ...seg,
         offset: 100,
-        percent: 0
+        percent: 0,
+        shown: false
       }
+
       return {
         ...seg,
-        color: relatedNewObj.color,
+        ...relatedNewObj,
         fromOffset: seg.offset,
-        offset: relatedNewObj.offset,
-        fromPercent: seg.percent,
-        percent: relatedNewObj.percent
+        fromPercent: seg.percent
       }
     })
       : newsegmentObjects.map((seg, idx) => {
@@ -155,11 +155,10 @@ class DonutChart extends Component {
           offset: 100,
           percent: 0
         }
+
         return {
           ...seg,
-          offset: seg.offset,
           fromOffset: relatedOldObj.offset,
-          percent: seg.percent,
           fromPercent: relatedOldObj.percent
         }
       })

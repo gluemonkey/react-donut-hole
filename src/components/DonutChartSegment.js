@@ -26,7 +26,8 @@ class DonutChartSegment extends Component {
     fromOffset: PropTypes.number.isRequired,
     lineWidth: PropTypes.number,
     animationDuration: PropTypes.string,
-    segmentStyle: PropTypes.oneOf(['flat', 'raised'])
+    segmentStyle: PropTypes.oneOf(['flat', 'raised']),
+    segmentShown: PropTypes.bool
   }
 
   constructor(props) {
@@ -62,8 +63,10 @@ class DonutChartSegment extends Component {
       offset,
       lineWidth,
       animationDuration,
-      segmentStyle
+      segmentStyle,
+      segmentShown
     } = this.props
+
     const { animate } = this.state
 
     const initialSegmentConfig = calcSegmentConfig(fromPercent, fromOffset, this.props)
@@ -73,11 +76,11 @@ class DonutChartSegment extends Component {
 
     const segmentContainerStyle = {
       transformOrigin: 'center 50%',
-      transitionProperty: 'all',
-      transitionDuration: animationDuration,
-      transitionDelay: '0s',
+      transitionProperty: segmentShown ? 'all, opacity' : 'all, opacity',
+      transitionDuration: segmentShown ? `${animationDuration}, 0s` : `${animationDuration}, 0s`,
+      transitionDelay: segmentShown ? '0s, 0s' : `0s, ${animationDuration}`,
       transitionTimingFunction: 'linear',
-      opacity: 1,
+      opacity: segmentShown ? 1 : 0,
       transform: animate ? `rotate(${toSegmentConfig.rotation}deg)` : `rotate(${initialSegmentConfig.rotation}deg)`
     }
 

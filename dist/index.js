@@ -95,17 +95,17 @@ var CircleElement = function CircleElement(props) {
     transitionTimingFunction: 'linear, linear'
   };
 
-  var activeStyles = _extends({}, baseStyles, {
+  var toStyles = _extends({}, baseStyles, {
     strokeDasharray: animatedSegmentConfig.dasharray,
     strokeDashoffset: animatedSegmentConfig.dashoffset
   });
 
-  var inactiveStyles = _extends({}, baseStyles, {
+  var fromStyles = _extends({}, baseStyles, {
     strokeDasharray: initalSegmentConfig.dasharray,
     strokeDashoffset: initalSegmentConfig.dashoffset
   });
 
-  var calcStyles = animatedIn ? activeStyles : inactiveStyles;
+  var calcStyles = animatedIn ? toStyles : fromStyles;
 
   return React__default.createElement('circle', _extends({}, circleProps, { style: calcStyles }));
 };
@@ -194,7 +194,8 @@ var DonutChartSegment = function (_Component) {
           offset = _props2.offset,
           lineWidth = _props2.lineWidth,
           animationDuration = _props2.animationDuration,
-          segmentStyle = _props2.segmentStyle;
+          segmentStyle = _props2.segmentStyle,
+          segmentShown = _props2.segmentShown;
       var animate = this.state.animate;
 
 
@@ -205,11 +206,11 @@ var DonutChartSegment = function (_Component) {
 
       var segmentContainerStyle = {
         transformOrigin: 'center 50%',
-        transitionProperty: 'all',
-        transitionDuration: animationDuration,
-        transitionDelay: '0s',
+        transitionProperty: segmentShown ? 'all, opacity' : 'all, opacity',
+        transitionDuration: segmentShown ? animationDuration + ', 0s' : animationDuration + ', 0s',
+        transitionDelay: segmentShown ? '0s, 0s' : '0s, ' + animationDuration,
         transitionTimingFunction: 'linear',
-        opacity: 1,
+        opacity: segmentShown ? 1 : 0,
         transform: animate ? 'rotate(' + toSegmentConfig.rotation + 'deg)' : 'rotate(' + initialSegmentConfig.rotation + 'deg)'
       };
 
@@ -251,7 +252,8 @@ DonutChartSegment.propTypes = {
   fromOffset: PropTypes.number.isRequired,
   lineWidth: PropTypes.number,
   animationDuration: PropTypes.string,
-  segmentStyle: PropTypes.oneOf(['flat', 'raised'])
+  segmentStyle: PropTypes.oneOf(['flat', 'raised']),
+  segmentShown: PropTypes.bool
 };
 
 var add = function add(a, b) {
@@ -325,7 +327,7 @@ var getSegmentConfigs = function getSegmentConfigs(segments, filters) {
       offset: segmentPercentage,
       color: color,
       showSeperator: hiddenSegmentCount < segments.length - 1,
-      shown: percent !== 0
+      shown: !segmentShown(segment, filters)
     });
 
     segmentPercentage += segPercent;
@@ -375,24 +377,22 @@ var DonutChart = function (_Component) {
       segmentObjects = oldSegmentObjects.length >= newsegmentObjects.length ? oldSegmentObjects.map(function (seg, idx) {
         var relatedNewObj = newsegmentObjects[idx] || _extends({}, seg, {
           offset: 100,
-          percent: 0
+          percent: 0,
+          shown: false
         });
-        return _extends({}, seg, {
-          color: relatedNewObj.color,
+
+        return _extends({}, seg, relatedNewObj, {
           fromOffset: seg.offset,
-          offset: relatedNewObj.offset,
-          fromPercent: seg.percent,
-          percent: relatedNewObj.percent
+          fromPercent: seg.percent
         });
       }) : newsegmentObjects.map(function (seg, idx) {
         var relatedOldObj = oldSegmentObjects[idx] || _extends({}, seg, {
           offset: 100,
           percent: 0
         });
+
         return _extends({}, seg, {
-          offset: seg.offset,
           fromOffset: relatedOldObj.offset,
-          percent: seg.percent,
           fromPercent: relatedOldObj.percent
         });
       });

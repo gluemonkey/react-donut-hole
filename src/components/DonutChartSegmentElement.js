@@ -18,19 +18,19 @@ const CircleElement = (props) => {
     transitionTimingFunction: 'linear, linear'
   }
 
-  const activeStyles = {
+  const toStyles = {
     ...baseStyles,
     strokeDasharray: animatedSegmentConfig.dasharray,
     strokeDashoffset: animatedSegmentConfig.dashoffset
   }
 
-  const inactiveStyles = {
+  const fromStyles = {
     ...baseStyles,
     strokeDasharray: initalSegmentConfig.dasharray,
     strokeDashoffset: initalSegmentConfig.dashoffset
   }
 
-  const calcStyles = animatedIn ? activeStyles : inactiveStyles
+  const calcStyles = animatedIn ? toStyles : fromStyles
 
   return (
     <circle {...circleProps} style={calcStyles} />
